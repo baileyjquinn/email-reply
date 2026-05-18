@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Email Reply Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f6f8;
+      color: #1a1a2e;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .header .badge {
+      display: inline-block;
+      background: #e8f4fd;
+      color: #1a6fb5;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .header h1 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      line-height: 1.25;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 16px;
+      color: #6b7280;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Card */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #111827;
+      resize: vertical;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    textarea::placeholder { color: #9ca3af; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+      width: 100%;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-copy {
+      background: #f3f4f6;
+      color: #374151;
+      font-size: 14px;
+      padding: 8px 16px;
+      border: 1.5px solid #e5e7eb;
+    }
+    .btn-copy:hover { background: #e5e7eb; }
+    .btn-copy.copied { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    #results { display: none; }
+
+    .result-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .result-item {}
+    .result-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .result-value {
+      font-size: 15px;
+      color: #111827;
+      line-height: 1.6;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+    .cat-urgent       { background: #fee2e2; color: #991b1b; }
+    .cat-followup     { background: #fef3c7; color: #92400e; }
+    .cat-fyi          { background: #dbeafe; color: #1e40af; }
+    .cat-spam         { background: #f3f4f6; color: #6b7280; }
+
+    .reply-box {
+      background: #f9fafb;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #111827;
+      white-space: pre-wrap;
+    }
+
+    .reply-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1.5px solid #f3f4f6;
+      margin: 4px 0;
+    }
+
+    /* Error */
+    .error-box {
+      background: #fee2e2;
+      border: 1.5px solid #fca5a5;
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: #991b1b;
+      font-size: 14px;
+      display: none;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="badge">Powered by Claude AI</div>
+      <h1>Get a professional reply to any customer email in seconds</h1>
+      <p>Paste a customer inquiry below and we'll tell you how urgent it is and write you a ready-to-send reply.</p>
+    </div>
+
+    <div class="card">
+      <label for="emailInput">Paste customer email</label>
+      <textarea
+        id="emailInput"
+        placeholder="Hi, I'm looking for someone to fix my AC unit. It stopped working yesterday and it's been really hot. Can you give me a call back? My number is 555-0142. Thanks, James"
+      ></textarea>
+
+      <div class="error-box" id="errorBox"></div>
+
+      <button class="btn btn-primary" id="generateBtn" onclick="generateReply()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btnText">Generate Reply</span>
+      </button>
+    </div>
+
+    <div class="card" id="results">
+      <div class="result-grid">
+
+        <div class="result-item">
+          <div class="result-label">Category</div>
+          <div class="result-value">
+            <span class="category-badge" id="categoryBadge"></span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="result-item">
+          <div class="result-label">Summary</div>
+          <div class="result-value" id="summaryValue"></div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="result-item">
+          <div class="reply-header">
+            <div class="result-label" style="margin-bottom:0">Suggested Reply</div>
+            <button class="btn btn-copy" id="copyBtn" onclick="copyReply()">Copy Reply</button>
+          </div>
+          <div class="reply-box" id="replyValue"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      Replies are AI-generated drafts — always review before sending.
+    </div>
+
+  </div>
+
+  <script>
+    async function generateReply() {
+      const email = document.getElementById("emailInput").value.trim();
+      const btn = document.getElementById("generateBtn");
+      const spinner = document.getElementById("spinner");
+      const btnText = document.getElementById("btnText");
+      const errorBox = document.getElementById("errorBox");
+      const results = document.getElementById("results");
+
+      // Reset
+      errorBox.style.display = "none";
+      results.style.display = "none";
+
+      if (!email) {
+        showError("Please paste a customer email first.");
+        return;
+      }
+
+      // Loading state
+      btn.disabled = true;
+      spinner.style.display = "block";
+      btnText.textContent = "Analysing...";
+
+      try {
+        const res = await fetch("/triage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || "Something went wrong. Please try again.");
+          return;
+        }
+
+        // Populate results
+        const badge = document.getElementById("categoryBadge");
+        badge.textContent = data.category;
+        badge.className = "category-badge " + categoryClass(data.category);
+
+        document.getElementById("summaryValue").textContent = data.summary;
+        document.getElementById("replyValue").textContent = data.reply_draft;
+
+        // Reset copy button
+        const copyBtn = document.getElementById("copyBtn");
+        copyBtn.textContent = "Copy Reply";
+        copyBtn.classList.remove("copied");
+
+        results.style.display = "block";
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      } catch (err) {
+        showError("Could not reach the server. Make sure server.py is running.");
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = "none";
+        btnText.textContent = "Generate Reply";
+      }
+    }
+
+    function categoryClass(cat) {
+      if (cat === "Urgent") return "cat-urgent";
+      if (cat === "Follow-up needed") return "cat-followup";
+      if (cat === "FYI only") return "cat-fyi";
+      return "cat-spam";
+    }
+
+    function showError(msg) {
+      const errorBox = document.getElementById("errorBox");
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+    }
+
+    async function copyReply() {
+      const text = document.getElementById("replyValue").textContent;
+      const btn = document.getElementById("copyBtn");
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy Reply";
+          btn.classList.remove("copied");
+        }, 2000);
+      } catch {
+        btn.textContent = "Select text manually";
+      }
+    }
+
+    // Allow Ctrl+Enter to submit
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "Enter") generateReply();
+    });
+  </script>
+</body>
+</html>
