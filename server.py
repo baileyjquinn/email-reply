@@ -48,8 +48,8 @@ LOGIN_PAGE = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign In</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #f4f6f8;
       min-height: 100vh;
@@ -57,8 +57,8 @@ LOGIN_PAGE = """<!DOCTYPE html>
       align-items: center;
       justify-content: center;
       padding: 16px;
-    }
-    .card {
+    }}
+    .card {{
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
@@ -66,8 +66,8 @@ LOGIN_PAGE = """<!DOCTYPE html>
       width: 100%;
       max-width: 400px;
       text-align: center;
-    }
-    .badge {
+    }}
+    .badge {{
       display: inline-block;
       background: #e8f4fd;
       color: #1a6fb5;
@@ -78,10 +78,10 @@ LOGIN_PAGE = """<!DOCTYPE html>
       border-radius: 20px;
       margin-bottom: 16px;
       text-transform: uppercase;
-    }
-    h1 { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 8px; }
-    p { font-size: 14px; color: #6b7280; margin-bottom: 28px; }
-    input[type="password"] {
+    }}
+    h1 {{ font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 8px; }}
+    p {{ font-size: 14px; color: #6b7280; margin-bottom: 28px; }}
+    input[type="password"] {{
       width: 100%;
       padding: 12px 14px;
       border: 1.5px solid #d1d5db;
@@ -90,9 +90,9 @@ LOGIN_PAGE = """<!DOCTYPE html>
       margin-bottom: 14px;
       transition: border-color 0.2s;
       font-family: inherit;
-    }
-    input[type="password"]:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    button {
+    }}
+    input[type="password"]:focus {{ outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }}
+    button {{
       width: 100%;
       padding: 13px;
       background: #2563eb;
@@ -102,16 +102,16 @@ LOGIN_PAGE = """<!DOCTYPE html>
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-    }
-    button:hover { background: #1d4ed8; }
-    .error {
+    }}
+    button:hover {{ background: #1d4ed8; }}
+    .error {{
       background: #fee2e2;
       color: #991b1b;
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 14px;
       margin-bottom: 14px;
-    }
+    }}
   </style>
 </head>
 <body>
